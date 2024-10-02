@@ -396,3 +396,44 @@ public function contact_form_message_field_has_minimum_characters()
 }
 
 ----------------------------------------------------------------------------------------------------------------------------------------------
+
+# Video 4 (Search Dropdown)
+
+# Next up, let's use the iTunes API to build a search dropdown that allows us to search for songs and artists. As part of this example, we'll also review how to test it.
+
+@if (strlen($search) > 2)
+    @forelse ($searchResults as $result)
+        {{ $reults }}
+    @empty
+        <li class="px-4 py-4">No results found for "{{ $search }}"</li>
+    @endforelse
+@endif
+
+# best way to search is to check whether $search input must eb greatet than 2 charcter then should show us result adn search for it.
+# use forelse when there is value so it will execute if empty then show no result
+
+# component exist or not
+public function main_page_contains_search_dropdown_livewire_component()
+{
+    $this->get('/')
+        ->assertSeeLivewire('search-dropdown');
+}
+
+# if song exist then it search correctly or not.
+public function search_dropdown_searches_correctly_if_song_exists()
+{
+    Livewire::test(SearchDropdown::class)
+        ->assertDontSee('John Lennon')
+        ->set('search', 'Imagine')
+        ->assertSee('John Lennon');
+}
+
+# if song does not exist then it search correctl or not.
+public function search_dropdown_shows_message_if_no_song_exists()
+{
+    Livewire::test(SearchDropdown::class)
+        ->set('search', 'asfastejoaiestioaet')
+        ->assertSee('No results found for');
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------
