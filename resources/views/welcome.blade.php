@@ -17,7 +17,9 @@
     <body class="font-sans antialiased mx-20">
         <h2 class="text-lg font-semibold">Standard Contact Form</h2>
         <livewire:contact-form />
+
         <hr>
+
         <h2 class="text-lg font-semibold mt-4">Livewire Search Dropdown</h2>
         <div class="my-8">
             <nav class="bg-white shadow">
@@ -95,8 +97,16 @@
                 </div>
             </nav>
         </div>
+        <div class="h-96">Scroll down...</div>
         <div class="h-96"></div>
-        <div class="h-96"></div>
+
+        <hr>
+
+        <div class="my-8">
+            <h2 class="text-lg font-semibold mt-4">Livewire Data Tables</h2>
+            <livewire:data-tables />
+        </div>
+
         @livewireScripts
     </body>
 </html>

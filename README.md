@@ -437,3 +437,38 @@ public function search_dropdown_shows_message_if_no_song_exists()
 }
 
 ----------------------------------------------------------------------------------------------------------------------------------------------
+
+# Video 5 (Pagination)
+
+# Pagination in Livewire is quite similar to pagination within a vanilla Laravel. Let's review everything you need to know in this episode.
+
+public function render()
+{
+    return view('livewire.data-tables', [
+        'users' => User::paginate(10),
+    ]);
+}
+
+<div class="mt-8">
+    {{ $users->links() }}
+</div>
+
+# simple like eating cake
+
+# if you want to customeize it.
+# make new function and make a view page for pagination and return it.
+
+use WithPagination;
+
+public function paginationView()
+{
+    return 'livewire.custom-pagination-links-view';
+}
+
+# laravel use tailwind by default if yyou want to change it to bootstrap do it like this.
+
+use WithPagination;
+
+protected $paginationTheme = 'bootstrap';
+
+----------------------------------------------------------------------------------------------------------------------------------------------
