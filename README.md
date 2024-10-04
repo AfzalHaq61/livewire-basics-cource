@@ -472,3 +472,66 @@ use WithPagination;
 protected $paginationTheme = 'bootstrap';
 
 ----------------------------------------------------------------------------------------------------------------------------------------------
+
+# Video 6 (Datatables)
+
+# Let's build a datatables component that allows a person to search, filter, sort and manipulate the query string. This component will demonstrate the power of Livewire, as building a datatables component the traditional way would require a significant amount of JavaScript.
+
+# if any dynamic variables are used in the query string and you are changed in thr frontend so it will direct reflect the query and changed all the data in fron end like 
+# if active variable is changed it will direct take all the user based on active vraible and change it in frontend
+# and same for search and sorting.
+# the query work like (A or B) and C And D so we will pass A and B to the where clause so it will look first into it then will check active and sort. A and B are basically the name and email to search.
+
+# Querystrings
+# if you want to show query parameters in url based on your vaiables then use "protected $queryString = []" and pass all the varible to it whcih you want to show.
+
+# sort functionality work like we passing the name of the field whcih will be sorted. first we check if it is sorted or normal so we check sorted field variable with the field passed in function if its not matched then it is normal so we changed the sort to asc and then passed field to sortfield variable it will sort in asc order of we again click it again we will check the field is equal to the sortfield variable if its equal then we change sort and now this time the sort will descending. so only those filed will be changed which we click and in front end it also look that if field and fieldvarible not matched then show empty if same then check whether asc or descending.
+
+# reset page while searching:
+# first of all use use WithPagination facade from live wire
+# then use updateSearch hook for search variable when its update then reset page pagination by this function "$this->resetPage();" so it will seach in all data not only in one page data.
+
+class DataTables extends Component
+{
+    use WithPagination;
+
+    public $active = true;
+    public $search;
+    public $sortField;
+    public $sortAsc = true;
+    protected $queryString = ['search', 'active', 'sortAsc', 'sortField'];
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortAsc = !$this->sortAsc;
+        } else {
+            $this->sortAsc = true;
+        }
+        $this->sortField = $field;
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function toglleActive() {
+        $this->active = !$this->active;
+    }
+
+    public function render()
+    {
+        return view('livewire.data-tables', [
+            'users' => User::where(function ($query) {
+                $query->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%');
+            })->where('active', $this->active)
+            ->when($this->sortField, function ($query) {
+                $query->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc');
+            })->paginate(10),
+        ]);
+    }
+}
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
