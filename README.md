@@ -589,3 +589,42 @@ public function testing()
 }
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
+
+# Video 8 (Comments Component)
+
+# In this lesson, we'll convert the comments functionality from vanilla Laravel to a Livewire component. Components like these are great use-cases for Livewire components, where we don’t want to trigger a full page-refresh after submitting a form.
+
+# we can pass props data to live wire components like and will resolve the depency in mount function in livewire controller.
+<livewire:comments-section :post="$post" />
+
+class CommentsSection extends Component
+{
+    public $post;
+
+    public function mount(Post $post)
+    {
+        $this->post = $post;
+    }
+
+# when the comment is created the created comment will not directly updated in view so we will find again post by its id and pass it to globall post variable.
+    public function postComment()
+    {
+        $this->validate();
+
+        sleep(1);
+        Comment::create([
+            'post_id' => $this->post->id,
+            'username' => 'Guest',
+            'content' => $this->comment,
+        ]);
+
+        $this->comment = '';
+
+        $this->post = Post::find($this->post->id);
+
+        $this->successMessage =  'Comment was posted!';
+    }
+}
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
