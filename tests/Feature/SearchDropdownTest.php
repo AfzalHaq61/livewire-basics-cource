@@ -5,9 +5,12 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Livewire\Livewire;
 use App\Livewire\SearchDropdown;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class SearchDropdownTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function main_page_contains_search_dropdown_livewire_component()
     {

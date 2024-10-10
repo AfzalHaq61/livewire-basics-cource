@@ -7,11 +7,12 @@ use Livewire\Livewire;
 use App\Livewire\ContactForm;
 use App\Mail\ContactFormMailable;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ContactFormTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function main_page_contains_contact_form_livewire_component()
     {

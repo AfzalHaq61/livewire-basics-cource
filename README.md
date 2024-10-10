@@ -535,3 +535,57 @@ class DataTables extends Component
 }
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
+
+# Video 7 (Datatables Testing)
+
+# Continuing from the previous episode, let's now write a series of tests for our datatable component.
+
+# use this trait to refresh database regulerly
+use RefreshDatabase;
+
+public function testing()
+{
+    $userA = User::create([
+        'name' => 'User',
+        'email' => 'user@user.com',
+        'password' => bcrypt('password'),
+        'active' => true,
+    ]);
+
+    $userB = User::create([
+        'name' => 'Another',
+        'email' => 'another@another.com',
+        'password' => bcrypt('password'),
+        'active' => false,
+    ]);
+
+    $userC = User::create([
+            'name' => 'Cathy C',
+            'email' => 'cathy@cathy.com',
+            'password' => bcrypt('password'),
+            'active' => true,
+        ]);
+
+# use this test for active and inactive filter
+# ->set() is used for setting variable
+    Livewire::test(DataTables::class)
+        ->assertSee($userA->name)
+        ->assertDontSee($userB->name)
+        ->set('active', false)
+        ->assertSee($userB->name)
+        ->assertDontSee($userA->name);
+
+# use this test for search filter
+    Livewire::test(DataTables::class)
+            ->set('search', 'user')
+            ->assertSee($userA->name)
+            ->assertDontSee($userB->name);
+   
+# use this test for soting asc and desc
+# ->call() is used for calling function.
+    Livewire::test(DataTables::class)
+            ->call('sortBy', 'name')
+            ->assertSeeInOrder(['Andre A', 'Brian B', 'Cathy C']);
+}
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
