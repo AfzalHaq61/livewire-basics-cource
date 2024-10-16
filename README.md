@@ -628,3 +628,34 @@ class CommentsSection extends Component
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
+
+# Video 9 (Livewire Polling)
+
+# Let's have a look at an example that uses polling in Livewire. Polling can prove useful when your components should continuously refresh to display the latest data.
+
+# when you want to call some data or variables continuously in some moment of time like you want to call it every one second or refresh you r component continuesly in a moment of time then you can use polling like below.
+
+<div wire:poll.1s="getRevenue">
+    Revenue: ${{ $revenue }}
+</div>
+
+# testing the poll
+public function poll_sums_orders_correctly()
+    {
+        $orderA = Order::create([ 'price' => 20]);
+        $orderB = Order::create([ 'price' => 20]);
+
+        Livewire::test(PollExample::class)
+            ->call('getRevenue')
+            ->assertSet('revenue', 40)
+            ->assertSee('$40');
+
+        $orderC = Order::create(['price' => 20]);
+
+        Livewire::test(PollExample::class)
+            ->call('getRevenue')
+            ->assertSet('revenue', 60)
+            ->assertSee('$60');
+    }
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
