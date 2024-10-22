@@ -629,7 +629,7 @@ class CommentsSection extends Component
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
 
-# Video 9 (Livewire Polling)
+# Video 10 (Livewire Polling)
 
 # Let's have a look at an example that uses polling in Livewire. Polling can prove useful when your components should continuously refresh to display the latest data.
 
@@ -659,3 +659,102 @@ public function poll_sums_orders_correctly()
     }
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
+
+# Video 11 (File Uploads)
+
+# Moving on, let's explore file uploading in Livewire. Livewire makes use of temporary uploads which allows us to perform real-time validation and image previews. Let's take a look at these with an example using posts with a cover image.
+
+# From the developer's perspective, handling file inputs is no different than handling any other input type: Add wire:model to the <input> tag and everything else is taken care of for you.
+
+# However, there is more happening under the hood to make file uploads work in Livewire. Here's a glimpse at what goes on when a user selects a file to upload:
+
+# When a new file is selected, Livewire's JavaScript makes an initial request to the component on the server to get a temporary "signed" upload URL.
+# Once the URL is received, JavaScript then does the actual "upload" to the signed URL, storing the upload in a temporary directory designated by Livewire and returning the new temporary file's unique hash ID.
+# Once the file is uploaded and the unique hash ID is generated, Livewire's JavaScript makes a final request to the component on the server telling it to "set" the desired public property to the new temporary file.
+# Now the public property (in this case $photo) is set to the temporary file upload and is ready to be stored or validated at any point.
+
+# view
+<div
+    class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+    <label for="photo" class="block text-sm leading-5 font-medium text-gray-700 sm:mt-px sm:pt-2">
+        Cover Photo
+    </label>
+
+# alpine js code for progress bar.
+    <div
+        class="mt-2 sm:mt-0 sm:col-span-2"
+            x-data="{ isUploading: false, progress: 0 }"
+            x-on:livewire-upload-start="isUploading = true"
+            x-on:livewire-upload-finish="isUploading = false"
+            x-on:livewire-upload-error="isUploading = false"
+            x-on:livewire-upload-progress="progress = $event.detail.progress"
+        >
+
+        <input wire:model="photo" type="file" name="photo">
+
+        @error('photo')
+            <p class="text-red-500 mt-1">{{ $message }}</p>
+        @enderror
+
+# progress bar
+        <!-- Progress Bar -->
+        <div class="mt-4" x-show="isUploading">
+            <progress max="100" x-bind:value="progress"></progress>
+        </div>
+
+# loader
+        <div>
+            <svg wire:loading wire:target="photo" class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+            </svg>
+        </div>
+
+# when upload image and its not submit livewire create a temp url for preview and the file is in temp folder in storege after submission it uplaod it to permanent storage.
+        <div class="mt-4">
+            @if ($photo)
+                <img src="{{ $photo->temporaryUrl() }}" alt="temp">
+            @elseif ($post->photo)
+                <img src="{{ Storage::url($post->photo) }}" alt="cover image">
+            @endif
+        </div>
+    </div>
+</div>
+
+# controller
+
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Post;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+
+class PostEdit extends Component
+{
+    use WithFileUploads;
+
+# In your Laravel validation rules, the sometimes rule means that the photo field will only be validated if it is present in the request.
+    protected $rules = [
+        'photo' => 'nullable|sometimes|image|max:5000',
+    ];
+    
+    public function submitForm()
+    {
+        $this->validate();
+        $imageToShow = $this->post->photo ?? null;
+        $this->post->update([
+            'title' => $this->title,
+            'content' => $this->content,
+            'photo' => $this->photo ? $this->photo->store('photos', 'public') : $imageToShow,
+        ]);
+        $this->successMessage = 'Post was updated successfully!';
+        // session()->flash('success_message', 'Post was updated successfully!');
+    }
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------
