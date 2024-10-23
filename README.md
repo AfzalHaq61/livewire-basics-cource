@@ -758,3 +758,62 @@ class PostEdit extends Component
 }
 
 ----------------------------------------------------------------------------------------------------------------------------------------------
+
+# Video 12 (File Uploads Testing)
+
+# Now, let's learn how to test the file upload component that we wrote in the previous episode.
+
+/** @test */
+public function post_edit_page_upload_works_for_images()
+{
+    $post = Post::create([
+        'title' => 'My First Post',
+        'content' => 'Content here',
+    ]);
+
+   # how to make fake disk in test
+    Storage::fake('public');
+   # make fake image and upload it to post
+    $file = UploadedFile::fake()->image('photo.jpg');
+
+    Livewire::test(PostEdit::class, [ 'post' => $post ])
+        ->set('title', 'New Title')
+        ->set('content', 'New content')
+        ->set('photo', $file)
+        ->call('submitForm')
+        ->assertSee('Post was updated successfully');
+
+    $post->refresh()
+    
+   # check whether post image is null or not
+    $this->assertNotNull($post->photo);
+   # check whether disk have an image or not
+    Storage::disk('public')->assertExists($post->photo);
+}
+
+/** @test */
+public function post_edit_page_upload_does_not_work_for_non_images()
+{
+    $post = Post::create([
+        'title' => 'My First Post',
+        'content' => 'Content here',
+    ]);
+
+    Storage::fake('public');
+   # how to make fake documents
+    $file = UploadedFile::fake()->create('document.pdf', 1000);
+
+    Livewire::test(PostEdit::class, [ 'post' => $post ])
+        ->set('title', 'New Title')
+        ->set('content', 'New content')
+        ->set('photo', $file)
+        ->call('submitForm')
+        ->assertSee('The photo must be an image')
+        ->assertHasErrors(['photo' => 'image']);
+
+    $post->refresh();
+    $this->assertNull($post->photo);
+    Storage::disk('public')->assertMissing($post->photo);
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------
